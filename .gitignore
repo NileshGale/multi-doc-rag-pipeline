@@ -1,0 +1,25 @@
+# Environment Variables & Secrets
+.env
+.env.local
+*.env
+
+# Jupyter Notebook Checkpoints & Virtual Documents
+.ipynb_checkpoints/
+.virtual_documents/
+
+# Python / Pycache / Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+
+# Vector Store / Persistent Storage
+data
+*.sqlite3
+
+# OS generated files
+.DS_Store
+Thumbs.db
