@@ -91,14 +91,17 @@ This project implements a complete multi-document RAG architecture capable of in
    ```
 
 4. **Configure Environment Variables**:
-   Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
-   ```
-   Open `.env` and insert your NVIDIA API key:
+   Create a `.env` file in the root directory:
    ```env
    NVIDIA_API_KEY="nvapi-your-actual-nvidia-api-key-here"
    ```
+
+5. **Upload PDF Documents**:
+   Create the `data/pdfs/` directory if it doesn't exist, and place your PDF files inside it:
+   ```bash
+   mkdir -p data/pdfs
+   ```
+   > 📄 Place any `.pdf` documents you want the RAG system to ingest into the `data/pdfs/` folder. The pipeline will automatically scan, chunk, embed, and index all PDFs placed in this folder.
 
 ---
 
@@ -107,7 +110,7 @@ This project implements a complete multi-document RAG architecture capable of in
 The notebook `RAG_pipeline.ipynb` breaks down into the following key steps:
 
 ### Step 1: Document Ingestion
-Loads 34 PDF documents (229 pages total) from `data/pdfs/` using `PyMuPDFLoader`.
+Scans the `data/pdfs/` folder and dynamically loads all PDF documents page-by-page using `PyMuPDFLoader`.
 
 ### Step 2: Document Chunking
 Splits the 229 loaded pages into **847 text chunks** using `RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)`.
