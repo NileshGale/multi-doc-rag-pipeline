@@ -1,0 +1,13 @@
+question,answer,num_chunks_retrieved,retrieval_hit,grounded
+What are the main challenges faced by Large Language Models that RAG addresses?,I could not find the answer in the provided documents.,5,False,False
+What does RAG stand for and what is its main purpose?,"RAG stands for Retrieval-Augmented. The main purpose of RAG is not explicitly stated in the provided context, but based on the information given, it appears to be related to question answering and information retrieval, particularly within the context of Large Language Models (LLMs).",5,False,False
+What is a Confusion Matrix used for?,A Confusion Matrix is used to evaluate the performance of a classification model by comparing actual labels with predicted labels.,2,True,True
+What does False Positive mean in a confusion matrix?,"In a Confusion Matrix, False Positive (FP) means the model predicts positive but the actual is negative (Type I error).",4,True,True
+What is a True Negative in classification evaluation?,A True Negative (TN) in classification evaluation is when the model correctly predicts the negative class.,5,True,True
+What is Mean Squared Error (MSE) and how is it calculated?,Mean Squared Error (MSE) is an evaluation metric that calculates the average of the squared differences between the actual and predicted values for all the data points. It is calculated as the average of the squared differences between the actual (yi) and predicted (yî) values for 'n' data points.,5,True,True
+Why are differences squared in the MSE formula?,Differences are squared in the MSE formula to ensure that negative and positive differences don't cancel each other out.,5,True,True
+What function does Logistic Regression use to map values to a probability range?,Sigmoid function.,4,True,True
+Is Logistic Regression used for regression or classification problems?,"Logistic Regression is used for classification problems, not regression ones.",5,True,True
+What type of neural network is used for binary image classification of cats and dogs?,Convolutional Neural Network (CNN),5,True,True
+What dataset is used for the cats vs dogs image classification project?,Dogs vs Cats dataset,5,True,True
+What ML model is used to predict house prices in the HomeVista Properties assignment?,Linear Regression model.,5,False,True
