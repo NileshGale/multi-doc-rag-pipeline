@@ -1,45 +1,49 @@
-# Multi-Document RAG (Retrieval-Augmented Generation) Pipeline
+# Multi-Document RAG (Retrieval-Augmented Generation) Pipeline & Web Interface
 
-An end-to-end Python Retrieval-Augmented Generation (RAG) system built using **LangChain**, **PyMuPDF**, **Sentence-Transformers (`all-MiniLM-L6-v2`)**, **ChromaDB**, and **NVIDIA NIM API (`meta/llama-3.1-70b-instruct`)**.
+An end-to-end Python Retrieval-Augmented Generation (RAG) system built using **LangChain**, **PyMuPDF4LLM (`langchain-pymupdf4llm`)**, **Sentence-Transformers (`all-MiniLM-L6-v2`)**, **ChromaDB**, **FastAPI**, and **NVIDIA NIM API (`meta/llama-3.1-70b-instruct`)**.
+
+Includes a modern, interactive web application (**Lumina AI**) built with custom glassmorphism styling, ambient glow animations, structured feature shortcuts, and real-time document grounding.
 
 ---
 
 ## 📌 Project Overview
 
-This project implements a complete multi-document RAG architecture capable of ingesting PDF documents, chunking text recursively, generating dense 384-dimensional vector embeddings, indexing them into a persistent vector database with Cosine Similarity search, and retrieving relevant context to generate grounded answers using NVIDIA's hosted Llama 3.1 70B Instruct model.
+This project implements a complete multi-document RAG architecture capable of ingesting PDF documents, chunking text recursively, generating dense 384-dimensional vector embeddings, indexing them into a persistent vector database with Cosine Similarity search, and serving an interactive Q&A web interface grounded using NVIDIA's hosted Llama 3.1 70B Instruct model.
 
 ### 🔑 Key Features
-- **Bulk PDF Ingestion**: Automatic parsing of multiple PDF files from `data/pdfs/` using `PyMuPDFLoader` (PyMuPDF/fitz).
+- **Standalone PDF Ingestion**: High-quality document parsing using `langchain-pymupdf4llm` (`PyMuPDF4LLMLoader`).
 - **Text Splitting & Chunking**: Recursive character text splitting (`chunk_size=500`, `chunk_overlap=50`) preserving document boundary semantics.
 - **Dense Vector Embeddings**: HuggingFace `SentenceTransformer` using model `all-MiniLM-L6-v2` (384 dimensions).
-- **Persistent Vector Store**: ChromaDB integration with `hnsw:space = cosine` index metric and document metadata tagging (`doc_id`, `source`, `page`, `content_length`).
-- **Semantic Retrieval**: Custom `RAGRetriever` class with threshold-filtered cosine similarity scoring.
-- **Grounded LLM Generation**: Prompt-engineered QA pipeline powered by **NVIDIA API (Llama 3.1 70B)** with strict hallucination-prevention constraints.
+- **Persistent Vector Store**: ChromaDB integration with `hnsw:space = cosine` index metric and metadata tracking (`source`, `page`, `doc_index`).
+- **Semantic Retrieval**: Custom `RAGRetriever` class with threshold-filtered cosine similarity scoring (`SCORE_THRESHOLD=0.4`, `TOP_K=5`).
+- **Grounded LLM Generation**: Prompt-engineered QA pipeline powered by **NVIDIA NIM API (Llama 3.1 70B)** with strict hallucination-prevention constraints.
+- **FastAPI Web Backend**: Async web backend (`app.py`) providing `/ask` and `/health` REST API endpoints alongside static UI serving.
+- **Modern Responsive UI (Lumina AI)**: Redesigned web interface (`ask_que.html`) with pastel glassmorphism accents (`#FFE2E2`, `#A2CB8B`, `#9AD872`, `#CFECF3`, `#F9D0CD`), glowing animated hero graphics, Font Awesome iconography, prompt cards, and source attribution badges.
 
 ---
 
 ## 🏗️ System Architecture
 
 ```
-┌─────────────────┐      ┌──────────────────────────┐      ┌───────────────────────────┐
-│ PDF Documents   │ ───► │ PyMuPDFLoader Ingestion  │ ───► │ Text Splitting (500 chars)│
-└─────────────────┘      └──────────────────────────┘      └───────────────────────────┘
-                                                                         │
-                                                                         ▼
-┌─────────────────┐      ┌──────────────────────────┐      ┌───────────────────────────┐
-│ User Query      │ ───► │ SentenceTransformer      │ ◄─── │ SentenceTransformer       │
-└─────────────────┘      │ (all-MiniLM-L6-v2)       │      │ Embeddings (384-dim)      │
-         │               └──────────────────────────┘      └───────────────────────────┘
-         │                             │                                 │
-         │                             ▼                                 ▼
-         │               ┌──────────────────────────┐      ┌───────────────────────────┐
-         └─────────────► │ Semantic Search (Chroma) │ ◄─── │ ChromaDB Persistent Store │
-                         └──────────────────────────┘      └───────────────────────────┘
-                                       │
-                                       ▼
-                         ┌──────────────────────────┐
-                         │ NVIDIA Llama 3.1 70B LLM │ ───► Grounded Response
-                         └──────────────────────────┘
+┌─────────────────┐      ┌──────────────────────────────┐      ┌───────────────────────────┐
+│ PDF Documents   │ ───► │ PyMuPDF4LLMLoader Ingestion │ ───► │ Text Splitting (500 chars)│
+└─────────────────┘      └──────────────────────────────┘      └───────────────────────────┘
+                                                                             │
+                                                                             ▼
+┌─────────────────┐      ┌──────────────────────────────┐      ┌───────────────────────────┐
+│ User Query      │ ───► │ SentenceTransformer          │ ◄─── │ SentenceTransformer       │
+│ (FastAPI /ask)  │      │ (all-MiniLM-L6-v2)           │      │ Embeddings (384-dim)      │
+└─────────────────┘      └──────────────────────────────┘      └───────────────────────────┘
+         │                               │                                   │
+         │                               ▼                                   ▼
+         │               ┌──────────────────────────────┐      ┌───────────────────────────┐
+         └─────────────► │ Semantic Search (Chroma)     │ ◄─── │ ChromaDB Persistent Store │
+                         └──────────────────────────────┘      └───────────────────────────┘
+                                         │
+                                         ▼
+                         ┌──────────────────────────────┐
+                         │ NVIDIA Llama 3.1 70B LLM     │ ───► Grounded Response & Sources
+                         └──────────────────────────────┘
 ```
 
 ---
@@ -48,14 +52,14 @@ This project implements a complete multi-document RAG architecture capable of in
 
 ```
 .
-├── RAG_pipeline.ipynb       # Main Jupyter Notebook containing the full RAG pipeline
+├── app.py                   # FastAPI backend server with lifespan lifecycle & RAG pipeline
+├── ask_que.html             # Modern Lumina AI frontend UI with glassmorphism styling
+├── RAG_pipeline.ipynb       # Jupyter Notebook detailing individual pipeline steps & evaluation
 ├── data/
-│   ├── pdfs/                # Directory containing PDF research documents (34 files)
-│   ├── python.txt           # Text document loader testing file
-│   ├── research.pdf         # Single PDF test file
-│   └── vector_store/        # Persistent Chroma DB vector database (ignored in git)
-├── .env                     # Local environment variables (contains NVIDIA_API_KEY - hidden from git)
-├── .gitignore               # Excludes secrets, caches, and vector DB
+│   ├── pdfs/                # Directory containing PDF research documents
+│   └── vector_store/        # Persistent ChromaDB database store (ignored in git)
+├── .env                     # Local environment variables (NVIDIA_API_KEY)
+├── .gitignore               # Ignores secrets, temporary caches, and vector DB
 └── README.md                # Project documentation
 ```
 
@@ -64,8 +68,7 @@ This project implements a complete multi-document RAG architecture capable of in
 ## 🚀 Getting Started
 
 ### 1. Prerequisites
-- Python 3.9+ installed
-- Jupyter Notebook / JupyterLab environment
+- Python 3.10+
 - An active **NVIDIA API Key** (from [NVIDIA Build](https://build.nvidia.com/))
 
 ### 2. Environment Setup
@@ -87,7 +90,7 @@ This project implements a complete multi-document RAG architecture capable of in
 
 3. **Install Required Packages**:
    ```bash
-   pip install langchain langchain-core langchain-community langchain-openai langchain-text-splitters pypdf pymupdf chromadb sentence-transformers python-dotenv scikit-learn
+   pip install fastapi uvicorn langchain-pymupdf4llm langchain-text-splitters sentence-transformers chromadb langchain-openai python-dotenv requests
    ```
 
 4. **Configure Environment Variables**:
@@ -97,44 +100,31 @@ This project implements a complete multi-document RAG architecture capable of in
    ```
 
 5. **Upload PDF Documents**:
-   Create the `data/pdfs/` directory if it doesn't exist, and place your PDF files inside it:
+   Place your PDF files into the `data/pdfs/` directory:
    ```bash
    mkdir -p data/pdfs
    ```
-   > 📄 Place any `.pdf` documents you want the RAG system to ingest into the `data/pdfs/` folder. The pipeline will automatically scan, chunk, embed, and index all PDFs placed in this folder.
+   > 📄 Any `.pdf` document placed inside `data/pdfs/` will be automatically chunked and indexed into ChromaDB when starting `app.py`.
 
 ---
 
-## 🧪 Pipeline Execution Walkthrough
+## 🖥️ Running the Application
 
-The notebook `RAG_pipeline.ipynb` breaks down into the following key steps:
+Start the FastAPI application:
 
-### Step 1: Document Ingestion
-Scans the `data/pdfs/` folder and dynamically loads all PDF documents page-by-page using `PyMuPDFLoader`.
+```bash
+python app.py
+```
 
-### Step 2: Document Chunking
-Splits the 229 loaded pages into **847 text chunks** using `RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)`.
+Then open your browser and navigate to:
+```
+http://127.0.0.1:8000
+```
 
-### Step 3: Embeddings & Vector Storage
-Instantiates `EmbeddingManager` (`all-MiniLM-L6-v2`) and initializes `VectorStoreManager` (ChromaDB persistent client). Indexes all 847 chunks into the `pdf_documents` collection with Cosine similarity indexing.
-
-### Step 4: Semantic Retrieval
-Configures `RAGRetriever` to embed queries, execute similarity search against Chroma DB, filter results with a `score_threshold` (e.g. 0.4), and return ranked candidate chunks.
-
-### Step 5: Grounded Generation (LLM)
-Connects to NVIDIA NIM API hosting `meta/llama-3.1-70b-instruct`. Synthesizes grounded responses with strict instructions:
-1. Use **ONLY** provided document context.
-2. Do not hallucinate or use external knowledge.
-3. Fallback response if answer is absent: `"I could not find the answer in the provided documents."`
-
----
-
-## 🛠️ Multi-Provider Support
-
-The pipeline includes built-in extensibility sections for alternative LLM providers:
-- **NVIDIA NIM API** (`meta/llama-3.1-70b-instruct`) — *Active*
-- **OpenAI API** (`gpt-4` / `gpt-3.5-turbo`) — *Optional section*
-- **Groq API** (`qwen/qwen3-32b` / `llama3-70b-8192`) — *Optional section*
+### API Endpoints
+- **`GET /`**: Serves the Lumina AI Q&A web interface (`ask_que.html`).
+- **`POST /ask`**: Accepts `{"question": "..."}` and returns `{"answer": "...", "sources": [...]}`.
+- **`GET /health`**: Returns system status and total indexed vector chunk count.
 
 ---
 
