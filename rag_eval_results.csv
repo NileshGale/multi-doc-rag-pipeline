@@ -1,94 +1,35 @@
 question,answer,num_chunks_retrieved,retrieval_hit,grounded
-What are the main challenges faced by Large Language Models that RAG addresses?,I could not find the answer in the provided documents.,5,False,False
+What are the main challenges faced by Large Language Models that RAG addresses?,I could not find the answer in the provided documents.,5,False,True
 What does RAG stand for and what is its main purpose?,I could not find the answer in the provided documents.,5,False,False
-What is a Confusion Matrix used for?,A Confusion Matrix is used to evaluate the performance of a classification model by comparing actual labels with predicted labels.,3,True,True
-What does False Positive mean in a confusion matrix?,False Positive (FP) means the model predicts positive but the actual is negative (Type I error).,5,True,True
-What is a True Negative in classification evaluation?,True Negative (TN): Model correctly predicts the negative class.,5,True,True
-What is Mean Squared Error (MSE) and how is it calculated?,"Mean Squared Error (MSE) is an evaluation metric that calculates the average of the squared differences between the actual and predicted values for all the data points. It is calculated using the formula:
+What is a Confusion Matrix used for?,It’s a table used to evaluate the performance of a classification model by comparing actual labels with predicted labels.,5,True,True
+What does False Positive mean in a confusion matrix?,I could not find the answer in the provided documents.,5,False,False
+What is a True Negative in classification evaluation?,I could not find the answer in the provided documents.,5,False,False
+What is Mean Squared Error (MSE) and how is it calculated?,Mean Squared Error (MSE) is an evaluation metric that calculates the average of the squared differences between the actual and predicted values for all the data points. The difference is squared to ensure that negative and positive differences are treated equally.,5,True,True
+Why are differences squared in the MSE formula?,The differences are squared in the MSE formula to ensure that negative and positive differences are treated equally.,5,True,True
+What function does Logistic Regression use to map values to a probability range?,"The Sigmoid function is used by Logistic Regression to map values to a probability range. 
 
-MSE = (1/n) * Σ(yi - yî)^2
-
-Where:
-- n is the number of data points
-- yi is the actual or observed value for the ith data point
-- yî is the predicted value for the ith data point
-
-The difference is squared to ensure that negative and positive differences don't cancel each other out.",5,True,True
-Why are differences squared in the MSE formula?,The differences are squared in the MSE formula to ensure that negative and positive differences don't cancel each other out.,5,True,True
-What function does Logistic Regression use to map values to a probability range?,"The Sigmoid function, which is given by g(z) = 1 / (1 + e^(-z)) with a range of (0, 1).",5,True,True
+The Sigmoid function is defined as:
+g(z) = 1 / (1 + e^(-z)) with a range (0, 1)",5,True,True
 Is Logistic Regression used for regression or classification problems?,"Logistic Regression is used for classification problems, not regression ones.",5,True,True
 What type of neural network is used for binary image classification of cats and dogs?,Convolutional Neural Network (CNN),5,True,True
-What dataset is used for the cats vs dogs image classification project?,Dogs vs Cats dataset,5,True,True
-What ML model is used to predict house prices in the HomeVista Properties assignment?,Linear Regression model.,5,False,True
+What dataset is used for the cats vs dogs image classification project?,Dogs vs Cats dataset.,5,True,True
+What ML model is used to predict house prices in the HomeVista Properties assignment?,I could not find the answer in the provided documents.,5,False,False
 What company wants to automate house pricing using Machine Learning?,HomeVista Properties.,5,True,True
 What is the goal of the TalentCore Pvt. Ltd. ML assignment?,"The goal of the TalentCore Pvt. Ltd. ML assignment is to build an intelligent ML system that can predict employee resignations based on job satisfaction, salary, age, work-life balance, training hours, bonuses, and other work-related factors.",5,False,True
 Which regularization techniques are compared in the employee attrition assignment?,I could not find the answer in the provided documents.,5,False,False
-What does HTML stand for and what is it used for?,"HTML stands for HyperText Markup Language, and it is used to create web pages and structure content on the web.",5,True,True
-What is the purpose of a .gitignore file?,The purpose of a .gitignore file is to prevent unintentional staging or committing of files by saving desired patterns as direct string matches or wildcard globs.,5,True,True
-What RL algorithm is used in the Mario-playing agent assignment?,Double Deep Q-Networks,3,True,True
+What does HTML stand for and what is it used for?,HTML stands for HyperText Markup Language. It is used to create web pages and structure content on the web.,5,True,True
+What is the purpose of a .gitignore file?,The purpose of a .gitignore file is to prevent unintentional staging or committing of files by saving desired patterns as either direct string matches or wildcard globs.,5,True,True
+What RL algorithm is used in the Mario-playing agent assignment?,Double Deep Q-Networks.,5,True,True
 How does RAG overcome the problem of outdated knowledge in LLMs?,I could not find the answer in the provided documents.,5,False,False
 What are the components of a RAG system?,I could not find the answer in the provided documents.,5,False,False
 what is python,Python is a high-level programming language.,5,False,True
-python variable?,"A variable in Python is like a container that stores data or values in a program. It has a name called an identifier and can store data of any type, such as numbers or text. The naming rules for variables in Python are: 
-1. The name must start with a letter (a-z, A-Z) or underscore.
-2. It can contain letters, numbers, or underscores after the first character.
-3. It cannot use Python keywords as variable names.
+python variable?,"A variable is like a container that stores data or values in our program. We can think of it as a labeled box where we can place something in, change it, or use it later. There are variables in Python: 
+1. Have names called identifiers. 
+2. Can store data of any type (numbers, text etc.)",5,False,True
+python datatypes?,"Python has several built-in data types. The simplest ones are:
 
-Example:
-name = ""Shradha""
-age = 30
-PI = 3.14
-word = ""artificial intelligence"" 
-
-Note: Invalid variable names include those that start with a number (e.g., 2name) and those that use Python keywords (e.g., class).",5,False,True
-python datatypes?,"The provided context lists the following Python data types:
-
-1. int (integer values)
-2. float (floating-point values)
-3. str (strings)
-4. bool (boolean values)
-
-Additionally, it mentions the following data types, but does not provide detailed descriptions:
-
-1. complex
-2. list
-3. tuple
-4. set
-5. None 
-
-It also mentions type conversion functions such as:
-
-1. float()
-2. str()
-3. bool()
-4. list()
-5. tuple()",5,False,True
-what is dictionary?,"A dictionary is an unordered, mutable collection of key-value pairs.",5,False,True
-python function?,"The special function used for printing (or outputting) something on the screen is called the ""print"" function. 
-
-Example: print()",5,False,False
-python funtion code?,"```python
-def function_name(parameters):
-    # function body
-    pass
-```",5,False,False
-python lambda funtion?,"Lambda functions are short, one-liner functions that are used to perform simple tasks. These are created using the `lambda` keyword. 
-
-Example of a lambda function that computes square of a number: 
-```python
-lambda n: n ** 2
-```",5,False,True
-what is loop and code?,"A loop is used to iterate (loop) over a sequence, such as a list, tuple, string, or range, and execute a block of code for each item in that sequence.
-
-Here is an example of a loop in Python:
-```
-while i <= 10:  
-    if(i % 6 == 0):  
-        break 
-    print(i) 
-    i += 1
-```
-Additionally, there is also a `for` loop:
-```
-for loop is used to iterate (loop) over a sequence, such as a list, tuple, string, or range, and execute a block of code for each item in that sequence.
-```",5,False,True
+1. Integer values (whole numbers)
+2. Floating-point values (decimal numbers)
+3. Strings (sequence of characters like words & sentences)
+4. Boolean values (True / False)",5,False,True
+what is dictionary in python ?,"A dictionary in Python is an unordered, mutable collection of key-value pairs.",5,False,True
