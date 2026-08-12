@@ -57,8 +57,8 @@ VECTOR_STORE_DIR = os.getenv("VECTOR_STORE_DIR", "data/vector_store")
 COLLECTION_NAME  = os.getenv("COLLECTION_NAME", "pdf_documents")
 CHUNK_SIZE       = int(os.getenv("CHUNK_SIZE", "500"))
 CHUNK_OVERLAP    = int(os.getenv("CHUNK_OVERLAP", "50"))
-TOP_K            = int(os.getenv("TOP_K", "5"))
-SCORE_THRESHOLD  = float(os.getenv("SCORE_THRESHOLD", "0.4"))
+TOP_K            = int(os.getenv("TOP_K", "7"))
+SCORE_THRESHOLD  = float(os.getenv("SCORE_THRESHOLD", "0.35"))
 ALLOWED_ORIGINS  = os.getenv("ALLOWED_ORIGINS", "http://localhost:8000,http://127.0.0.1:8000").split(",")
 CACHE_TTL_SEC    = int(os.getenv("CACHE_TTL_SEC", "3600"))  # 1 hour default TTL
 # ──────────────────────────────────────────────────────────
@@ -181,23 +181,31 @@ class RAGRetriever:
 
     def retrieve(self, query, top_k=TOP_K, score_threshold=SCORE_THRESHOLD):
         q_emb   = self.embedding_manager.generate_embeddings([query])[0]
+        # Query more candidates to allow deduplication of repeated chunks
+        fetch_k = max(top_k * 4, 20)
         results = self.vector_store.collection.query(
-            query_embeddings=[q_emb.tolist()], n_results=top_k
+            query_embeddings=[q_emb.tolist()], n_results=fetch_k
         )
         retrieved = []
+        seen_contents = set()
+
         if results["documents"] and results["documents"][0]:
             for doc_id, meta, doc, dist in zip(
                 results["ids"][0], results["metadatas"][0],
                 results["documents"][0], results["distances"][0],
             ):
                 sim = 1 - dist
-                if sim >= score_threshold:
+                normalized_doc = doc.strip()
+                if sim >= score_threshold and normalized_doc not in seen_contents:
+                    seen_contents.add(normalized_doc)
                     retrieved.append({
                         "document": doc,
                         "source":   meta.get("source", ""),
                         "page":     meta.get("page", ""),
                         "similarity_score": round(sim, 3),
                     })
+                    if len(retrieved) >= top_k:
+                        break
         return retrieved
 
 
