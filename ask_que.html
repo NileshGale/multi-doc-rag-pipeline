@@ -530,7 +530,14 @@
     if (t) t.remove();
   }
 
-  // ── Main send ──
+  // ── Session ID management ──
+  let sessionId = sessionStorage.getItem("rag_session_id");
+  if (!sessionId) {
+    sessionId = "sess_" + Math.random().toString(36).substring(2, 10);
+    sessionStorage.setItem("rag_session_id", sessionId);
+  }
+
+  // ── Main send with SSE streaming ──
   async function sendQuestion() {
     const q = textarea.value.trim();
     if (!q) return;
@@ -543,24 +550,87 @@
     showTyping();
 
     try {
-      const res = await fetch(`${API}/ask`, {
+      const res = await fetch(`${API}/ask/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q }),
+        body: JSON.stringify({ question: q, session_id: sessionId }),
       });
 
       hideTyping();
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        appendMsg("bot", `<span style="color:var(--peach)">Error ${res.status}: ${err.detail || "Something went wrong"}</span>`);
-      } else {
-        const data = await res.json();
-        appendMsg("bot", formatAnswer(data.answer), data.sources);
+        appendMsg("bot", `<span style="color:var(--peach)"><i class="fa-solid fa-triangle-exclamation"></i> Error ${res.status}: ${err.detail || "Something went wrong"}</span>`);
+        sendBtn.disabled = false;
+        textarea.focus();
+        return;
       }
+
+      // Create streaming bot message bubble
+      const welcome = document.getElementById("welcome");
+      if (welcome) welcome.remove();
+
+      const row = document.createElement("div");
+      row.className = "msg-row bot";
+
+      const avatar = document.createElement("div");
+      avatar.className = "avatar bot";
+      avatar.innerHTML = '<i class="fa-solid fa-robot"></i>';
+
+      const wrap = document.createElement("div");
+      wrap.className = "bubble-wrap";
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble bot";
+      wrap.appendChild(bubble);
+
+      const srcRow = document.createElement("div");
+      srcRow.className = "sources";
+      wrap.appendChild(srcRow);
+
+      row.appendChild(avatar);
+      row.appendChild(wrap);
+      chat.appendChild(row);
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let rawAnswer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n\n");
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const dataStr = line.replace("data: ", "").trim();
+          if (dataStr === "[DONE]") break;
+
+          try {
+            const data = JSON.parse(dataStr);
+            if (data.type === "sources" && data.sources && data.sources.length) {
+              data.sources.forEach(s => {
+                const tag = document.createElement("div");
+                tag.className = "source-tag";
+                tag.innerHTML = `<i class="fa-solid fa-file-pdf" style="color:var(--peach)"></i> <span>${s.file}</span>&nbsp;p.${Number(s.page)+1}&nbsp;<span class="score">${(s.score*100).toFixed(0)}%</span>`;
+                srcRow.appendChild(tag);
+              });
+            } else if (data.type === "content") {
+              rawAnswer += data.delta;
+              bubble.innerHTML = formatAnswer(rawAnswer);
+              chat.scrollTop = chat.scrollHeight;
+            } else if (data.type === "error") {
+              bubble.innerHTML += `<br><span style="color:var(--peach)">${data.detail}</span>`;
+            }
+          } catch (err) {}
+        }
+      }
+
     } catch (e) {
       hideTyping();
-      appendMsg("bot", `<span style="color:var(--peach)"><i class="fa-solid fa-triangle-exclamation"></i> Could not reach the server. Make sure <code>app.py</code> is running on <code>localhost:8000</code>.</span>`);
+      appendMsg("bot", `<span style="color:var(--peach)"><i class="fa-solid fa-triangle-exclamation"></i> Could not reach server. Make sure <code>app.py</code> is running on <code>localhost:8000</code>.</span>`);
     }
 
     sendBtn.disabled = false;
@@ -572,6 +642,7 @@
   }
 
   function formatAnswer(text) {
+    text = escHtml(text);
     text = text.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
     text = text.replace(/\n/g, "<br>");
     return text;
